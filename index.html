@@ -1,61 +1,72 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Letter For You</title>
 
-  <title>Valentine Letter</title>
+  <!-- Optional: pixel font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Aldrich&family=Pixelify+Sans:wght@400..700&display=swap"
-    rel="stylesheet"
-  />
 </head>
-
 <body>
+
   <!-- Envelope Screen -->
-  <div id="envelope-container">
-    <img src="envelope.png" alt="Envelope" id="envelope" />
-    <p>♡ Letter for You ♡</p>
+  <div id="envelope-container" aria-label="Open the letter">
+    <div class="envelope-wrap">
+      <img src="envelope.png" alt="Envelope" />
+      <div class="subtitle">♡ Letter For You ♡</div>
+    </div>
   </div>
 
   <!-- Letter Screen -->
   <div id="letter-container">
-    <div class="letter-window" id="letter-window">
-      <h1 id="letter-title">Will you be my Valentine?</h1>
+    <div class="letter-window" id="letterWindow">
 
-      <!-- Eevee Pair -->
-      <div class="eevee-pair" id="letter-cat">
-        <img src="Espeon.png" class="espeon" alt="Espeon" />
-        <img src="Umbreon.png" class="umbreon" alt="Umbreon" />
+      <div class="topbar">
+        <div class="topbar-title">Love</div>
+        <div class="topbar-icons">— □ ✕</div>
       </div>
 
-      <!-- Celebration Image -->
-      <img src="hurray!.png" id="celebration" alt="Hurray" />
+      <div class="hearts-row">
+        <div class="heart"></div>
+        <div class="heart"></div>
+        <div class="heart"></div>
+      </div>
 
-      <!-- Buttons -->
-      <div class="buttons" id="letter-buttons">
-        <img src="yes.png" class="btn yes-btn" id="yesBtn" alt="Yes" />
+      <div class="content">
+        <h2 id="letter-title">Will you be my Valentine?</h2>
 
-        <div class="no-wrapper">
-          <img src="no.png" class="btn no-btn" id="noBtn" alt="No" />
+        <!-- Eevee pair -->
+        <div class="eevee-pair" id="eeveePair">
+          <img class="espeon" src="espeon.png" alt="Espeon" />
+          <img class="umbreon" src="umbreon.png" alt="Umbreon" />
+        </div>
+
+        <!-- Buttons -->
+        <div id="letter-buttons">
+          <button class="btn" id="yesBtn" type="button">YES</button>
+
+          <!-- Slot keeps space so YES doesn’t move when NO becomes fixed -->
+          <div id="noSlot">
+            <button class="btn" id="noBtn" type="button">NO</button>
+          </div>
+        </div>
+
+        <!-- Final screen -->
+        <div id="final-text">
+          <h2>Yippee!</h2>
+          <img src="hurray!.png" alt="Hurray!" />
+          <p><strong>Valentine Date:</strong> Go To A Pokemon Show With Me?</p>
         </div>
       </div>
 
-      <!-- Final Text -->
-      <p id="final-text" class="final-text" style="display: none">
-        <strong>Valentine Date:</strong> Meow Restaurant at 7pm. Dress fancy!
-      </p>
     </div>
   </div>
 
-  <!-- Script -->
   <script src="script.js"></script>
 </body>
 </html>

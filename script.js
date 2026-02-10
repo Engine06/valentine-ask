@@ -1,68 +1,78 @@
 // Elements
 const envelope = document.getElementById("envelope-container");
-const letter = document.getElementById("letter-container");
+const letterContainer = document.getElementById("letter-container");
+const letterWindow = document.getElementById("letterWindow");
 
-const yesBtn = document.querySelector(".btn[alt='Yes']");
-const noWrapper = document.querySelector(".no-wrapper");
-const noBtn = document.querySelector(".no-btn");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const noSlot = document.getElementById("noSlot");
 
-const title = document.getElementById("letter-title");
-const catNode = document.getElementById("letter-cat");
-const buttons = document.getElementById("letter-buttons");
 const finalText = document.getElementById("final-text");
-const letterWindow = document.querySelector(".letter-window");
 
-// Click Envelope
+// Open letter
 envelope.addEventListener("click", () => {
   envelope.style.display = "none";
-  letter.style.display = "flex";
+  letterContainer.style.display = "flex";
 
-  setTimeout(() => {
-    letterWindow.classList.add("open");
-  }, 50);
+  // Let layout paint first
+  setTimeout(() => letterWindow.classList.add("open"), 50);
+
+  // Reserve NO button space so layout won't shift later
+  reserveNoSpace();
 });
 
-// Helper: move NO somewhere random inside the letter window (safe bounds)
-function moveNoRandom() {
-  const bounds = letterWindow.getBoundingClientRect();
-  const noRect = noWrapper.getBoundingClientRect();
-
-  // Padding so it doesn't go off-screen / behind edges
-  const padding = 20;
-
-  const minX = padding;
-  const maxX = bounds.width - noRect.width - padding;
-  const minY = padding;
-  const maxY = bounds.height - noRect.height - padding;
-
-  const x = Math.max(minX, Math.random() * maxX);
-  const y = Math.max(minY, Math.random() * maxY);
-
-  // Move relative to the letter window
-  noWrapper.style.left = `${x}px`;
-  noWrapper.style.top = `${y}px`;
+function reserveNoSpace() {
+  // lock the slot to NO's size so YES stays in place even when NO becomes fixed
+  const w = noBtn.offsetWidth;
+  const h = noBtn.offsetHeight;
+  noSlot.style.width = `${w}px`;
+  noSlot.style.height = `${h}px`;
 }
 
-// Make sure NO wrapper is absolutely positioned relative to letter window
-// (so it can roam anywhere in the window)
-noWrapper.style.position = "absolute";
-noWrapper.style.zIndex = "5";
+// Move NO anywhere on screen (true viewport randomness)
+let lastX = -9999;
+let lastY = -9999;
 
-// On hover/focus (mouse & mobile-ish)
-noBtn.addEventListener("mouseenter", moveNoRandom);
-noBtn.addEventListener("mouseover", moveNoRandom);
-noBtn.addEventListener("touchstart", (e) => {
-  e.preventDefault(); // stop accidental clicks
-  moveNoRandom();
+function moveNo() {
+  const padding = 20;
+
+  const btnW = noBtn.offsetWidth;
+  const btnH = noBtn.offsetHeight;
+
+  const maxX = window.innerWidth - btnW - padding;
+  const maxY = window.innerHeight - btnH - padding;
+
+  let x, y;
+
+  // avoid tiny hops near the last location
+  do {
+    x = Math.random() * maxX + padding;
+    y = Math.random() * maxY + padding;
+  } while (Math.abs(x - lastX) < 140 && Math.abs(y - lastY) < 140);
+
+  lastX = x;
+  lastY = y;
+
+  // IMPORTANT: fixed = not trapped by any container
+  noBtn.style.position = "fixed";
+  noBtn.style.left = `${x}px`;
+  noBtn.style.top = `${y}px`;
+  noBtn.style.zIndex = "9999";
+}
+
+// Keep them side-by-side at first (no suspicion),
+// then NO teleports away when she approaches.
+noBtn.addEventListener("mouseenter", moveNo);
+noBtn.addEventListener("click", moveNo);
+noBtn.addEventListener("touchstart", moveNo);
+
+// YES -> final screen
+yesBtn.addEventListener("click", () => {
+  letterWindow.classList.add("final");
+  finalText.style.display = "block";
 });
 
-// YES is clicked
-yesBtn.addEventListener("click", () => {
-  title.textContent = "Yippeeee!";
-
-  // If letter-cat is now a DIV (Eevee pair), don't set .src.
-  // Just show the celebration via CSS (.letter-window.final).
-  letterWindow.classList.add("final");
-  buttons.style.display = "none";
-  finalText.style.display = "block";
+// Keep slot reserved on resize too
+window.addEventListener("resize", () => {
+  reserveNoSpace();
 });
