@@ -1,86 +1,111 @@
-// ===== Elements =====
+// --------------------
+// Elements
+// --------------------
 const envelope = document.getElementById("envelope-container");
 const letter = document.getElementById("letter-container");
-const letterWindow = document.getElementById("letter-window");
 
-const noBtn = document.getElementById("noBtn");
-const yesBtn = document.getElementById("yesBtn");
+// Buttons
+const noBtn = document.querySelector(".no-hitbox");
+const yesBtn = document.querySelector(".yes-hitbox");
 
-const buttonsArea = document.getElementById("letter-buttons");
-const finalArea = document.getElementById("final");
+// Swappable UI parts (NEW IDs from your cleaned HTML)
+const titleText = document.getElementById("title-text");
+const pokemonPair = document.getElementById("pokemon-pair");
+const hurrayImg = document.getElementById("hurray-img");
+const buttonGroup = document.getElementById("button-group");
+const dateText = document.getElementById("date-text");
 
-// ===== Open envelope -> show letter =====
+// Text variables (easy to edit)
+const QUESTION_TEXT = "Will you be my Valentine?";
+const YES_TEXT = "Yippeeee!";
+
+let mouseArmed = false;
+
+// --------------------
+// Open Envelope
+// --------------------
 envelope.addEventListener("click", () => {
   envelope.style.display = "none";
   letter.style.display = "flex";
 
-  // Reset "No" movement each open
-  noBtn.dataset.t = "0,0";
-  noBtn.style.transform = "translateX(-50%) translate(0px, 0px)";
+  setTimeout(() => {
+    document.querySelector(".letter-window").classList.add("open");
 
-  // Reset Yes size
-  yesBtn.dataset.m = "1";
-  yesBtn.style.transform = "translateX(-50%) scale(1)";
+    // Reset state in case page is reopened
+    titleText.textContent = QUESTION_TEXT;
 
-  // Animate letter opening
-  setTimeout(() => letterWindow.classList.add("open"), 50);
+    pokemonPair.style.display = "flex";
+    hurrayImg.style.display = "none";
+
+    buttonGroup.style.display = "flex";
+    dateText.style.display = "none";
+
+    // Prevent instant NO teleport if mouse is already there
+    mouseArmed = false;
+    document.addEventListener(
+      "mousemove",
+      () => {
+        mouseArmed = true;
+      },
+      { once: true }
+    );
+  }, 50);
 });
 
-// ===== Move "No" inside letter bounds =====
-function moveNoButton() {
-  const bounds = letterWindow.getBoundingClientRect();
-  const btn = noBtn.getBoundingClientRect();
+// --------------------
+// NO teleport
+// --------------------
+function teleportNo() {
+  const windowEl = document.querySelector(".letter-window");
+  if (!windowEl) return;
 
-  const padding = 12;
+  const windowRect = windowEl.getBoundingClientRect();
+  const noRect = noBtn.getBoundingClientRect();
 
-  const minX = bounds.left + padding;
-  const maxX = bounds.right - btn.width - padding;
-  const minY = bounds.top + padding;
-  const maxY = bounds.bottom - btn.height - padding;
+  // Center of the letter window
+  const centerX = windowRect.left + windowRect.width / 2;
+  const centerY = windowRect.top + windowRect.height / 2;
 
-  if (maxX <= minX || maxY <= minY) return;
+  // Random offset within ±100px
+  const RANGE = 100;
+  const offsetX = (Math.random() * 2 - 1) * RANGE; // -100 → +100
+  const offsetY = (Math.random() * 2 - 1) * RANGE; // -100 → +100
 
-  // Random target (viewport coords)
-  const x = Math.random() * (maxX - minX) + minX;
-  const y = Math.random() * (maxY - minY) + minY;
+  // Place NO so its center lands on (center + offset)
+  let x = centerX + offsetX - noRect.width / 2;
+  let y = centerY + offsetY - noRect.height / 2;
 
-  const current = noBtn.getBoundingClientRect();
+  // Clamp so it stays on screen
+  const pad = 10;
+  x = Math.max(pad, Math.min(x, window.innerWidth - noRect.width - pad));
+  y = Math.max(pad, Math.min(y, window.innerHeight - noRect.height - pad));
 
-  // Delta needed to move to target
-  const dx = x - current.left;
-  const dy = y - current.top;
-
-  // Keep accumulating translation so it "stays where it ran to"
-  const prev = (noBtn.dataset.t || "0,0").split(",").map(Number);
-  const nx = prev[0] + dx;
-  const ny = prev[1] + dy;
-
-  noBtn.dataset.t = `${nx},${ny}`;
-  noBtn.style.transform = `translateX(-50%) translate(${nx}px, ${ny}px)`;
+  noBtn.style.position = "fixed";
+  noBtn.style.left = `${x}px`;
+  noBtn.style.top = `${y}px`;
 }
 
-// Move on hover
-noBtn.addEventListener("mouseover", moveNoButton);
 
-// Move on click + grow YES quickly
-noBtn.addEventListener("click", () => {
-  moveNoButton();
 
-  const currentScale = yesBtn.dataset.m ? Number(yesBtn.dataset.m) : 1;
-  const nextScale = Math.min(currentScale + 0.14, 2.2); // faster growth
-  yesBtn.dataset.m = String(nextScale);
 
-  yesBtn.style.transform = `translateX(-50%) scale(${nextScale})`;
+
+// Move NO when she tries to hover it
+noBtn.addEventListener("pointerenter", () => {
+  if (!mouseArmed) return;
+  teleportNo();
 });
 
-// ===== YES clicked -> show final =====
+// --------------------
+// YES clicked (swap state)
+// --------------------
 yesBtn.addEventListener("click", () => {
-  buttonsArea.style.display = "none";
-  finalArea.style.display = "grid";
-});
+  titleText.textContent = YES_TEXT;
 
-// ===== Safety: on resize, reset No so it can't end up outside =====
-window.addEventListener("resize", () => {
-  noBtn.dataset.t = "0,0";
-  noBtn.style.transform = "translateX(-50%) translate(0px, 0px)";
+  // Center slot swap: pair -> hurray
+  pokemonPair.style.display = "none";
+  hurrayImg.style.display = "block";
+
+  // Bottom slot swap: buttons -> date idea
+  buttonGroup.style.display = "none";
+  dateText.style.display = "block";
 });
