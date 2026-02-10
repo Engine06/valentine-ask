@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Valentine Letter</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Aldrich&family=Pixelify+Sans:wght@400..700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+
+<body>
+  <!-- Envelope Screen -->
+  <div id="envelope-container">
+    <img src="envelope.png" alt="Envelope" id="envelope" />
+    <p>♡ Letter for You ♡</p>
+  </div>
+
+  <!-- Letter Screen -->
+  <div id="letter-container">
+    <div class="letter-window" id="letter-window">
+      <h1 id="letter-title">Will you be my Valentine?</h1>
+
+      <!-- Eevee Pair -->
+      <div class="eevee-pair" id="letter-cat">
+        <img src="Espeon.png" class="espeon" alt="Espeon" />
+        <img src="Umbreon.png" class="umbreon" alt="Umbreon" />
+      </div>
+
+      <!-- Celebration Image -->
+      <img src="hurray!.png" id="celebration" alt="Hurray" />
+
+      <!-- Buttons -->
+      <div class="buttons" id="letter-buttons">
+        <img src="yes.png" class="btn yes-btn" id="yesBtn" alt="Yes" />
+
+        <div class="no-wrapper">
+          <img src="no.png" class="btn no-btn" id="noBtn" alt="No" />
+        </div>
+      </div>
+
+      <!-- Final Text -->
+      <p id="final-text" class="final-text" style="display: none">
+        <strong>Valentine Date:</strong> Meow Restaurant at 7pm. Dress fancy!
+      </p>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script src="script.js"></script>
+</body>
+</html>
