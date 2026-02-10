@@ -1,78 +1,86 @@
-// Elements
+// ===== Elements =====
 const envelope = document.getElementById("envelope-container");
-const letterContainer = document.getElementById("letter-container");
-const letterWindow = document.getElementById("letterWindow");
+const letter = document.getElementById("letter-container");
+const letterWindow = document.getElementById("letter-window");
 
-const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
-const noSlot = document.getElementById("noSlot");
+const yesBtn = document.getElementById("yesBtn");
 
-const finalText = document.getElementById("final-text");
+const buttonsArea = document.getElementById("letter-buttons");
+const finalArea = document.getElementById("final");
 
-// Open letter
+// ===== Open envelope -> show letter =====
 envelope.addEventListener("click", () => {
   envelope.style.display = "none";
-  letterContainer.style.display = "flex";
+  letter.style.display = "flex";
 
-  // Let layout paint first
+  // Reset "No" movement each open
+  noBtn.dataset.t = "0,0";
+  noBtn.style.transform = "translateX(-50%) translate(0px, 0px)";
+
+  // Reset Yes size
+  yesBtn.dataset.m = "1";
+  yesBtn.style.transform = "translateX(-50%) scale(1)";
+
+  // Animate letter opening
   setTimeout(() => letterWindow.classList.add("open"), 50);
-
-  // Reserve NO button space so layout won't shift later
-  reserveNoSpace();
 });
 
-function reserveNoSpace() {
-  // lock the slot to NO's size so YES stays in place even when NO becomes fixed
-  const w = noBtn.offsetWidth;
-  const h = noBtn.offsetHeight;
-  noSlot.style.width = `${w}px`;
-  noSlot.style.height = `${h}px`;
+// ===== Move "No" inside letter bounds =====
+function moveNoButton() {
+  const bounds = letterWindow.getBoundingClientRect();
+  const btn = noBtn.getBoundingClientRect();
+
+  const padding = 12;
+
+  const minX = bounds.left + padding;
+  const maxX = bounds.right - btn.width - padding;
+  const minY = bounds.top + padding;
+  const maxY = bounds.bottom - btn.height - padding;
+
+  if (maxX <= minX || maxY <= minY) return;
+
+  // Random target (viewport coords)
+  const x = Math.random() * (maxX - minX) + minX;
+  const y = Math.random() * (maxY - minY) + minY;
+
+  const current = noBtn.getBoundingClientRect();
+
+  // Delta needed to move to target
+  const dx = x - current.left;
+  const dy = y - current.top;
+
+  // Keep accumulating translation so it "stays where it ran to"
+  const prev = (noBtn.dataset.t || "0,0").split(",").map(Number);
+  const nx = prev[0] + dx;
+  const ny = prev[1] + dy;
+
+  noBtn.dataset.t = `${nx},${ny}`;
+  noBtn.style.transform = `translateX(-50%) translate(${nx}px, ${ny}px)`;
 }
 
-// Move NO anywhere on screen (true viewport randomness)
-let lastX = -9999;
-let lastY = -9999;
+// Move on hover
+noBtn.addEventListener("mouseover", moveNoButton);
 
-function moveNo() {
-  const padding = 20;
+// Move on click + grow YES quickly
+noBtn.addEventListener("click", () => {
+  moveNoButton();
 
-  const btnW = noBtn.offsetWidth;
-  const btnH = noBtn.offsetHeight;
+  const currentScale = yesBtn.dataset.m ? Number(yesBtn.dataset.m) : 1;
+  const nextScale = Math.min(currentScale + 0.14, 2.2); // faster growth
+  yesBtn.dataset.m = String(nextScale);
 
-  const maxX = window.innerWidth - btnW - padding;
-  const maxY = window.innerHeight - btnH - padding;
+  yesBtn.style.transform = `translateX(-50%) scale(${nextScale})`;
+});
 
-  let x, y;
-
-  // avoid tiny hops near the last location
-  do {
-    x = Math.random() * maxX + padding;
-    y = Math.random() * maxY + padding;
-  } while (Math.abs(x - lastX) < 140 && Math.abs(y - lastY) < 140);
-
-  lastX = x;
-  lastY = y;
-
-  // IMPORTANT: fixed = not trapped by any container
-  noBtn.style.position = "fixed";
-  noBtn.style.left = `${x}px`;
-  noBtn.style.top = `${y}px`;
-  noBtn.style.zIndex = "9999";
-}
-
-// Keep them side-by-side at first (no suspicion),
-// then NO teleports away when she approaches.
-noBtn.addEventListener("mouseenter", moveNo);
-noBtn.addEventListener("click", moveNo);
-noBtn.addEventListener("touchstart", moveNo);
-
-// YES -> final screen
+// ===== YES clicked -> show final =====
 yesBtn.addEventListener("click", () => {
-  letterWindow.classList.add("final");
-  finalText.style.display = "block";
+  buttonsArea.style.display = "none";
+  finalArea.style.display = "grid";
 });
 
-// Keep slot reserved on resize too
+// ===== Safety: on resize, reset No so it can't end up outside =====
 window.addEventListener("resize", () => {
-  reserveNoSpace();
+  noBtn.dataset.t = "0,0";
+  noBtn.style.transform = "translateX(-50%) translate(0px, 0px)";
 });
