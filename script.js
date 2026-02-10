@@ -55,30 +55,37 @@ envelope.addEventListener("click", () => {
 // --------------------
 // NO teleport
 // --------------------
+
+let angle = 0;
+const RADIUS = 400;           // size of the circle
+const ANGLE_STEP = Math.PI / 3; // how far it moves each hover
+
 function teleportNo() {
   const windowEl = document.querySelector(".letter-window");
   if (!windowEl) return;
 
   const windowRect = windowEl.getBoundingClientRect();
-  const noRect = noBtn.getBoundingClientRect();
 
-  // Center of the letter window
-  const centerX = windowRect.left + windowRect.width / 2;
-  const centerY = windowRect.top + windowRect.height / 2;
+  // IMPORTANT: clear any old transform behavior so we don't orbit around the first jump
+  noBtn.style.transform = "none";
 
-  // Random offset within ±100px
-  const RANGE = 100;
-  const offsetX = (Math.random() * 2 - 1) * RANGE; // -100 → +100
-  const offsetY = (Math.random() * 2 - 1) * RANGE; // -100 → +100
+  // Make sure it has a measurable size (use offsetWidth/Height for stability)
+  const noW = noBtn.offsetWidth;
+  const noH = noBtn.offsetHeight;
 
-  // Place NO so its center lands on (center + offset)
-  let x = centerX + offsetX - noRect.width / 2;
-  let y = centerY + offsetY - noRect.height / 2;
+  // Center of the letter window (this is the ONLY anchor)
+  const centerX = 170;
+  const centerY = 80;
+
+  angle += ANGLE_STEP;
+
+  let x = centerX + Math.cos(angle) * RADIUS - noW / 2;
+  let y = centerY + Math.sin(angle) * RADIUS - noH / 2;
 
   // Clamp so it stays on screen
   const pad = 10;
-  x = Math.max(pad, Math.min(x, window.innerWidth - noRect.width - pad));
-  y = Math.max(pad, Math.min(y, window.innerHeight - noRect.height - pad));
+  x = Math.max(pad, Math.min(x, window.innerWidth - noW - pad));
+  y = Math.max(pad, Math.min(y, window.innerHeight - noH - pad));
 
   noBtn.style.position = "fixed";
   noBtn.style.left = `${x}px`;
@@ -104,6 +111,14 @@ yesBtn.addEventListener("click", () => {
   // Center slot swap: pair -> hurray
   pokemonPair.style.display = "none";
   hurrayImg.style.display = "block";
+
+  hurrayImg.classList.remove("jump");
+  void hurrayImg.offsetWidth;
+  hurrayImg.classList.add("jump");
+
+  setTimeout(() => {
+    hurrayImg.classList.remove("jump");
+  }, 5000);
 
   // Bottom slot swap: buttons -> date idea
   buttonGroup.style.display = "none";

@@ -140,6 +140,18 @@ body {
   transform: translateY(4px);
 }
 
+@keyframes hurrayJump {
+  0%   { transform: translateY(4px) scale(0.95); }
+  35%  { transform: translateY(-18px) scale(1.08); }
+  60%  { transform: translateY(4px) scale(1.0); }
+  80%  { transform: translateY(-8px) scale(1.04); }
+  100% { transform: translateY(4px) scale(1.0); }
+}
+
+.celebration.jump {
+  animation: hurrayJump 1s infinite;
+}
+
 /* Bottom slot (buttons OR date) */
 #bottom-slot {
   width: 100%;
